@@ -12,8 +12,6 @@ import org.eclipse.jgit.storage.file.FileBasedConfig;
 import org.eclipse.jgit.util.SystemReader;
 
 public class Main {
-
-
     private static final Path saveConfig = Path.of("trumpedConfig");
     private static final Path tempConfig = Path.of("tempConfig");
     public static void main(String[] args) {
