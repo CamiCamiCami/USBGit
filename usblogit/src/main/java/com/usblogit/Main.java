@@ -6,30 +6,75 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Scanner;
 
 import org.eclipse.jgit.errors.ConfigInvalidException;
 import org.eclipse.jgit.storage.file.FileBasedConfig;
+import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.SystemReader;
 
 public class Main {
-    private static final Path saveConfig = Path.of("trumpedConfig");
-    private static final Path tempConfig = Path.of("tempConfig");
+    private static final Path localConfigBackup = Path.of("trumpedConfig");
+    private static final Path savedConfig = Path.of("tempConfig");
+    private static final Path localTokenBackup = Path.of("trumpedToken");
+    private static final Path savedToken = Path.of("tempToken");
+    private static final String tokenFilename = ".git-credentials";
     public static void main(String[] args) {
-        Path config = getConfigPath();
+        if(Files.exists(savedToken, LinkOption.NOFOLLOW_LINKS) && Files.exists(savedConfig, LinkOption.NOFOLLOW_LINKS)) {
+            int action = 0;
+            System.out.println("1) Log in");
+            System.out.println("2) Reregister");
+            Scanner scan = new Scanner(System.in);
+            while (action != 1 && action != 2) {
+                System.out.print("Select an action: ");
+                action = scan.nextInt();
+            }
+            if (action == 1) logIn();
+            else register();
+        } else {
+            register();
+        }
+    }
+
+
+    private static void register() {
         try {
-            exchangeConfigFiles(config);
+            FileBasedConfig userConfig = new FileBasedConfig(savedConfig.toAbsolutePath().toFile(), FS.detect());
+            userConfig.load();
+            Scanner scan = new Scanner(System.in);
+            System.out.println("Input your login info:");
+            System.out.print("Name: ");
+            String name = scan.nextLine();
+            System.out.print("Email: ");
+            String email = scan.nextLine();
+            System.out.print("Token: ");
+            String token = scan.nextLine();
+
+            userConfig.setString("user", null, "name", name);
+            userConfig.setString("user", null, "email", email);
+            userConfig.setString("credential", null, "helper", "store");
+            userConfig.save();
+            Files.writeString(savedToken, token);
+        } catch (Exception e) {
+            System.err.println("An error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    private static void logIn() {
+        Path localConfig = getConfigPath();
+        Path localToken = localConfig.getParent().resolve(tokenFilename);
+        try {
+            exchangeFiles(localConfig, savedConfig, localConfigBackup);
+            exchangeFiles(localToken, savedToken, localTokenBackup);
             System.out.println("Press enter to log out:");
             System.in.read();
+            restoreFile(localConfig, localConfigBackup);
+            restoreFile(localToken, localTokenBackup);
         } catch (IOException e) {
-            System.err.println("I/O Error: " + e.toString());
-            System.exit(1);
-        }
-        try {
-            restoreConfigFile(config);
-        } catch (IOException e) {
-            System.err.println("I/O Error: " + e.getMessage());
-            System.err.println("No pudo restaurar el archivo " + config.toString() + " con " + saveConfig.toString());
-            System.err.println("Por favor hagalo manualmente");
+            System.err.println("I/O error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -41,43 +86,48 @@ public class Main {
             String path = userConfig.getPath();
             return Path.of(path);
         } catch(IOException e) {
-            System.out.println("IO Exception: " + e.getMessage());
+            System.out.println("IO error: " + e.toString());
             System.exit(1);
             return Path.of("");
         } catch (ConfigInvalidException e) {
-            System.out.println("Config Exception: " + e.getMessage());
+            System.out.println("Config exception: " + e.toString());
             System.exit(1);
             return Path.of("");
         }
-    } 
+    }
 
 
-    
-    private static void exchangeConfigFiles(Path config) throws IOException {
+    private static void exchangeFiles(Path file, Path newFile, Path backup) throws IOException {
         try {
-            Files.copy(config, saveConfig, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(file, backup, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            if (!Files.notExists(config, LinkOption.NOFOLLOW_LINKS)) {
+            if (!Files.notExists(file, LinkOption.NOFOLLOW_LINKS)) {
                 // Caso verdaderamente problematico
                 throw e;
             }
         } finally {
-            Files.copy(tempConfig, config, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(newFile, file, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
-    private static void restoreConfigFile(Path config) throws IOException {
+
+    private static void restoreFile(Path file, Path backup) throws IOException {
         try {
-            Files.copy(saveConfig, config, StandardCopyOption.REPLACE_EXISTING);
-            Files.delete(saveConfig);
+            Files.copy(backup, file, StandardCopyOption.REPLACE_EXISTING);
+            Files.delete(backup);
         } catch (IOException e) {
-            if (Files.notExists(saveConfig, LinkOption.NOFOLLOW_LINKS)) {
+            if (Files.notExists(backup, LinkOption.NOFOLLOW_LINKS)) {
                 // Nada que restaurar, simplemente borra
-                Files.delete(config);
+                Files.delete(file);
             } else {
-                // Caso verdaderamente problematico
-                throw e;
+                System.err.println("I/O error: " + e.toString());
+                System.err.println("Couldn't restore local file " + file.toString() + " with the backup at " + backup.toString());
+                System.err.println("Please do so manually");
             }
         }
+    }
+
+    public static String getTokenFilename() {
+        return tokenFilename;
     }
 }
