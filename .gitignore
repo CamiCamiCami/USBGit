@@ -1,5 +1,4 @@
-.vscode/*
-usblogit/target/*
-tempConfig
-trumpedConfig
-USBGit.jar
+*
+.gitignore
+!bash/
+!bash/*
