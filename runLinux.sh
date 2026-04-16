@@ -16,7 +16,8 @@ if ! [[ -d "./saves" ]]; then
     mkdir "./saves"
 fi
 
-while [ true ]; do
+shouldExit=false
+while ! $shouldExit; do
     if [[ -f "$CUSTOM_CONFIG_FILE" && -f "$CUSTOM_TOKEN_FILE" ]]; then
         echo "Select an action: "
         echo "1) Reregister"
@@ -28,7 +29,7 @@ while [ true ]; do
         elif [[ "$selection" == "2" ]]; then
             . "$LOGIN"
         elif [[ "$selection" == "3" ]]; then
-            break
+            shouldExit=true
         else
             printf "Invalid action: %s (expected 1, 2 or 3)" "$selection"
         fi
@@ -36,10 +37,12 @@ while [ true ]; do
     else
         . "$REGISTER"
     fi
+    clear
 done
 
 cd "$callerDirectory"
 
+unset shouldExit
 unset callerDirectory
 unset LOGIN
 unset REGISTER
