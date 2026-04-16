@@ -1,5 +1,5 @@
-SAVED_CONFIG=../saves/.savedConfig
-SAVED_TOKEN=../saves/.savedToken
+CUSTOM_CONFIG=../saves/.customConfig
+CUSTOM_TOKEN=../saves/.customToken
 
 
 cd executables
@@ -8,21 +8,21 @@ read -rp "Enter your git username: " username
 read -rp "Enter your git mail: " mail
 read -rp "Enter your login token: " token
 
-touch "$SAVED_CONFIG"
-if [[ -f "$SAVED_TOKEN" ]]; then
-    rm "$SAVED_TOKEN"
-    touch "$SAVED_TOKEN"
+touch "$CUSTOM_CONFIG"
+if [[ -f "$CUSTOM_TOKEN" ]]; then
+    rm "$CUSTOM_TOKEN"
+    touch "$CUSTOM_TOKEN"
 fi
 
-git config --file "$SAVED_CONFIG" user.name "$username"
-git config --file "$SAVED_CONFIG" user.mail "$mail"
-git config --file "$SAVED_CONFIG" credential.helper store
-printf https://%s:%s@github.com "$username" "$token" > "$SAVED_CONFIG"
+git config --file "$CUSTOM_CONFIG" user.name "$username"
+git config --file "$CUSTOM_CONFIG" user.mail "$mail"
+git config --file "$CUSTOM_CONFIG" credential.helper store
+printf https://%s:%s@github.com "$username" "$token" > "$CUSTOM_TOKEN"
 
 cd ..
 
-unset SAVED_CONFIG
-unset SAVED_TOKEN
+unset CUSTOM_CONFIG
+unset CUSTOM_TOKEN
 unset username
 unset mail
 unset token
