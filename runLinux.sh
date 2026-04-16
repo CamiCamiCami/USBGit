@@ -16,7 +16,7 @@ if ! [[ -d "./saves" ]]; then
     mkdir "./saves"
 fi
 
-while [ shouldRun ]; do
+while [ true ]; do
     if [[ -f "$CUSTOM_CONFIG_FILE" && -f "$CUSTOM_TOKEN_FILE" ]]; then
         echo "Select an action: "
         echo "1) Reregister"
