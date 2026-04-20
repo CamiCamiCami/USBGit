@@ -1,4 +1,5 @@
 @echo off
+setlocal
 set "CUSTOM_CONFIG=..\saves\.customConfig"
 set "CUSTOM_TOKEN=..\saves\.customToken"
 set "SAVED_CONFIG=..\saves\.savedConfig"

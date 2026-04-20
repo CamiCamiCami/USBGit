@@ -36,7 +36,7 @@ if "%selection%" == "1" (
 ) else if "%selection%" == "3" (
     goto loop_end
 ) else (
-    echo "Invalid action: " "%selection%" " (expected 1, 2 or 3)" 
+    echo Invalid action: "%selection%" (expected 1, 2 or 3)
 )
 cls
 GOTO loop
