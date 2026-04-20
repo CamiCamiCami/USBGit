@@ -1,5 +1,6 @@
 CUSTOM_CONFIG=../saves/.customConfig
 CUSTOM_TOKEN=../saves/.customToken
+LOCAL_TOKEN="$HOME"/.git-credentials
 
 
 cd executables
@@ -16,16 +17,14 @@ fi
 
 git config --file "$CUSTOM_CONFIG" user.name "$username"
 git config --file "$CUSTOM_CONFIG" user.mail "$mail"
-git config --file "$CUSTOM_CONFIG" credential.helper store
+git config --file "$CUSTOM_CONFIG" credential.helper "store --file $LOCAL_TOKEN"
 printf https://%s:%s@github.com "$username" "$token" > "$CUSTOM_TOKEN"
 
 cd ..
 
 unset CUSTOM_CONFIG
 unset CUSTOM_TOKEN
+unset LOCAL_TOKEN
 unset username
 unset mail
 unset token
-
-
-
