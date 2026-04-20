@@ -8,6 +8,8 @@ LOCAL_TOKEN=$HOME/.git-credentials
 
 cd executables
 
+git config --file "$CUSTOM_CONFIG" credential.helper "store --file \"$LOCAL_TOKEN\""
+
 if [[ -f "$LOCAL_CONFIG" ]]; then
     cp "$LOCAL_CONFIG" "$SAVED_CONFIG"
 fi

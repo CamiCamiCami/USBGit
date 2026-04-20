@@ -10,6 +10,8 @@ set "LOCAL_TOKEN=%USERPROFILE%\.git-credentials"
 
 cd "executables"
 
+git config --file "%CUSTOM_CONFIG%" credential.helper "store --file ""%LOCAL_TOKEN%"""
+
 if exist "%LOCAL_CONFIG%" copy  "%LOCAL_CONFIG%" "%SAVED_CONFIG%" > nul
 if exist "%LOCAL_TOKEN%" copy  "%LOCAL_TOKEN%" "%SAVED_TOKEN%" > nul
 

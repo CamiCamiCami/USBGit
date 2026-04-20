@@ -17,7 +17,6 @@ fi
 
 git config --file "$CUSTOM_CONFIG" user.name "$username"
 git config --file "$CUSTOM_CONFIG" user.mail "$mail"
-git config --file "$CUSTOM_CONFIG" credential.helper "store --file $LOCAL_TOKEN"
 printf https://%s:%s@github.com "$username" "$token" > "$CUSTOM_TOKEN"
 
 cd ..

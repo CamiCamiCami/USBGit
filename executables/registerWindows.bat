@@ -2,6 +2,7 @@
 setlocal
 set "CUSTOM_CONFIG=..\saves\.customConfig"
 set "CUSTOM_TOKEN=..\saves\.customToken"
+set "LOCAL_TOKEN=%USERPROFILE%\.git-credentials"
 
 
 cd "executables"
@@ -15,7 +16,6 @@ type nul >  %CUSTOM_TOKEN%
 
 git config --file "%CUSTOM_CONFIG%" user.name "%username%"
 git config --file "%CUSTOM_CONFIG%" user.mail "%mail%"
-git config --file "%CUSTOM_CONFIG%" credential.helper store
 echo https://%username%:%token%@github.com > %CUSTOM_TOKEN%
 
 cd ".."
